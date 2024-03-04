@@ -38,7 +38,10 @@ def fileExistsCheck(csvFilePath: str) -> bool:
 
 # Check if a key value already existst inside the csv file
 def checkCsvValueExists(csvFilePath: str, columnName: str, targetValue: str) -> bool:
-    if not fileExistsCheck(csvFilePath):
+    file_exists = fileExistsCheck(csvFilePath)
+    file_is_empty = os.path.getsize(csvFilePath) == 0 if file_exists else True
+
+    if not file_exists or file_is_empty:
         return False
 
     # Open the CSV file in read mode
@@ -58,9 +61,6 @@ def checkCsvValueExists(csvFilePath: str, columnName: str, targetValue: str) -> 
 def convertCsvToExcel(csvFilePath: str, excelFilePath: str, columnNames: dict, encoding='latin1'):
     # Read the CSV file into a pandas DataFrame
     df = pd.read_csv(csvFilePath, encoding=encoding, names=columnNames)
-
-    # Print the first few rows of the DataFrame
-    print(df.head())
 
     # Write the DataFrame to an Excel file
     df.to_excel(excelFilePath, index=False)
