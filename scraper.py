@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
@@ -26,16 +27,17 @@ def seleniumInit(url: str):
 # Interact with page through selenium
 def interactWithPageElem(driver, selector):
     print(selector)
-    element = driver.find_element(By.CSS_SELECTOR, selector)
-
-    # Scroll the element into view
-    driver.execute_script("arguments[0].scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });", element)
-
-    # Wait for the scrolling animation to complete
-    time.sleep(5)
-
-    # Wait for an element to be clickable before clicking it
-    element.click()
+    
+    try:
+        element = driver.find_element(By.CSS_SELECTOR, selector)
+        # Scroll the element into view
+        driver.execute_script("arguments[0].scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });", element)
+        # Wait for the scrolling animation to complete
+        time.sleep(5)
+        # Wait for an element to be clickable before clicking it
+        element.click()
+    except NoSuchElementException:
+        return False
 
     return driver
 

@@ -28,8 +28,8 @@ for channel in channels:
         scrape_url = url_template.format(location=location, maxRent=str(max_rent_price), page = 1) # we need to use selenium here
         seleniumDriver = scraper.seleniumInit(scrape_url)
 
-        # scrape 5 pages
-        for i in range(1, 5):
+        # scrape 10 pages
+        for i in range(1, 10):
             print(scrape_url)
             aria_label = 'pagina'
 
@@ -39,13 +39,19 @@ for channel in channels:
             # Find an element by its CSS selector and click it
             paginationSelector =  f'button[aria-label="{aria_label} {i}"]'
             updatedDriver = scraper.interactWithPageElem(seleniumDriver, paginationSelector)
+
+            # No updates to make so break
+            if not updatedDriver:
+                print('break')
+                break
+
             result_container = scraper.scrapeThroughSelenium(updatedDriver, channels[0]['target_class'])
 
             # Get all page results of the result container
             searchResults = result_container.findChildren()
             kamernet.scrapeResults(searchResults, scrapeContentKeys)
 
-        seleniumDriver.quit()
+        seleniumDriver.quit() # After all pages are scraped exit driver
     else:
         print('unsupported channel')
         sys.exit()
