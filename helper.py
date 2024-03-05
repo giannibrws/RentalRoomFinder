@@ -1,7 +1,6 @@
 import os, json, sys, csv
 import pandas as pd
 
-
 """
 Write data to csv file
 

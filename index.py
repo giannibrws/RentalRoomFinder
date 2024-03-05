@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-import os, json, sys, csv
+import os, json, sys, csv, time
 import scraper, helper
 import kamernet
 
@@ -24,18 +24,28 @@ for channel in channels:
 
     if channel['name'] == 'Kamernet':
         max_rent_price = int(os.getenv("MAX_RENT_PRICE")) / 100
+        # Replace the placeholders with the actual values using string formatting
+        scrape_url = url_template.format(location=location, maxRent=str(max_rent_price), page = 1) # we need to use selenium here
+        seleniumDriver = scraper.seleniumInit(scrape_url)
 
-        # scrape 10 pages
+        # scrape 5 pages
         for i in range(1, 5):
-            # Replace the placeholders with the actual values using string formatting
-            scrape_url = url_template.format(location=location, maxRent=str(max_rent_price), page = i) 
             print(scrape_url)
+            aria_label = 'pagina'
 
-            result_container = scraper.scrapeUrl(scrape_url, channels[0]['target_class'])
+            if i > 1:
+                aria_label = 'Ga naar pagina'
+
+            # Find an element by its CSS selector and click it
+            paginationSelector =  f'button[aria-label="{aria_label} {i}"]'
+            updatedDriver = scraper.interactWithPageElem(seleniumDriver, paginationSelector)
+            result_container = scraper.scrapeThroughSelenium(updatedDriver, channels[0]['target_class'])
 
             # Get all page results of the result container
             searchResults = result_container.findChildren()
             kamernet.scrapeResults(searchResults, scrapeContentKeys)
+
+        seleniumDriver.quit()
     else:
         print('unsupported channel')
         sys.exit()

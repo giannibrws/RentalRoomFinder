@@ -1,6 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
 from dotenv import load_dotenv
 import os, json, sys, time
 
@@ -9,28 +13,47 @@ load_dotenv()
 
 # Path to Chrome WebDriver executable
 chromedriver_path = os.getenv("CHROMEDRIVER_PATH")
+driver = None
+
+# Initialize selenium for designated url
+def seleniumInit(url: str):
+    # Set up Selenium webdriver
+    driver = webdriver.Chrome(executable_path=chromedriver_path)  # You need to have Chrome webdriver installed
+    driver.get(url)  # Replace with your URL
+    time.sleep(5)  # Allow time for JavaScript to execute
+    return driver
+
+# Interact with page through selenium
+def interactWithPageElem(driver, selector):
+    print(selector)
+    element = driver.find_element(By.CSS_SELECTOR, selector)
+
+    # Scroll the element into view
+    driver.execute_script("arguments[0].scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });", element)
+
+    # Wait for the scrolling animation to complete
+    time.sleep(5)
+
+    # Wait for an element to be clickable before clicking it
+    element.click()
+
+    return driver
 
 """
 Scrape content from a designated page url with Selenium (bypass js limitations)
 
 Args: 
-    scrapeUrl (str): The url to be scraped 
+    driver (any): The initialized selenium driver containing the page content
     targetClass (str): The class that points to the content that needs to be scraped
 
 Returns: Bs4 Object|Void
 
 """
 
-def scrapeUrlThoroughly(scrapeUrl: str, targetClass: str):
-    # Set up Selenium webdriver
-    driver = webdriver.Chrome(executable_path=chromedriver_path)  # You need to have Chrome webdriver installed
-
-    driver.get(scrapeUrl)  # Replace with your URL
-    time.sleep(5)  # Allow time for JavaScript to execute
+def scrapeThroughSelenium(driver: any, targetClass: str):
     html = driver.page_source  # Get the page source after JavaScript rendering
-
     soup = BeautifulSoup(html, 'html.parser')
-    driver.quit()   # Close the Selenium webdriver after data is retrieved
+    #driver.quit()   # Close the Selenium webdriver after data is retrieved
 
     target_div = soup.find('div', class_=targetClass)
 
@@ -39,7 +62,6 @@ def scrapeUrlThoroughly(scrapeUrl: str, targetClass: str):
         sys.exit()  # Stop script execution
     
     return target_div
-
 
 """
 Scrape content from a designated page url
