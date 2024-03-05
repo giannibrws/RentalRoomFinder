@@ -27,7 +27,7 @@ def seleniumInit(url: str):
 # Interact with page through selenium
 def interactWithPageElem(driver, selector):
     print(selector)
-    
+
     try:
         element = driver.find_element(By.CSS_SELECTOR, selector)
         # Scroll the element into view
@@ -76,14 +76,14 @@ Returns: Bs4 Object|Void
 
 """
 
-def scrapeUrl(scrapeUrl: str, targetClass: str):
+def scrapeUrl(scrapeUrl: str, targetClass: str, attribute: str = 'div'):
     response = requests.get(scrapeUrl)
 
     # Parse the HTML content of the page
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Find the specific div you want to scrape by its class or ID
-    target_div = soup.find('div', class_=targetClass)
+    target_div = soup.find(attribute, class_=targetClass)
     # target_div = soup.find('div', id='div_id')  # Example for finding by ID
 
     if not target_div:

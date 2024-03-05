@@ -63,3 +63,10 @@ def convertCsvToExcel(csvFilePath: str, excelFilePath: str, columnNames: dict, e
 
     # Write the DataFrame to an Excel file
     df.to_excel(excelFilePath, index=False)
+
+def findSoup(soup, attr, className):
+    e = soup.find(attr, class_=className)
+
+    if not e:
+        return '-'
+    return e.text

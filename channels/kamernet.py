@@ -12,7 +12,6 @@ channels = {}
 with open('channels.json', 'r') as f:
     channels = json.load(f)
 
-
 channel = channels[0]
 channel_url = channel['url']
 location = os.getenv("SEARCH_LOCATION")
@@ -62,7 +61,7 @@ def scrapeResults(searchResults, scrapeContentKeys):
 
         gNextFlag = False
         gFlagKey = "x"
-        flagKeys = ["Aantal huurders", "Leeftijd", "Geslacht", "Bezigheid"]
+        flagKeys = ["Aantal huurders", "Leeftijd", "Geslacht", "Doelgroep"]
 
         # Filter all p data
         for p_elem in p_elems:
