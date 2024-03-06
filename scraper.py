@@ -16,24 +16,51 @@ load_dotenv()
 chromedriver_path = os.getenv("CHROMEDRIVER_PATH")
 driver = None
 
+# Check if chromedriver is enabled correctly
+def chromeDriverEnabled() -> bool:
+    if '.exe' not in chromedriver_path:
+        print('If you want to use selenium make sure you are using the correct chromedriver path')
+        return False
+    try:
+        d = seleniumInit('https://example.com/', 0)
+        d.quit()
+    except:
+        print('Please make sure you are using the correct chromedriver path')
+        return False
+
+    return True
+
+
 # Initialize selenium for designated url
-def seleniumInit(url: str):
+def seleniumInit(url: str , delay = 5):
     # Set up Selenium webdriver
     driver = webdriver.Chrome(executable_path=chromedriver_path)  # You need to have Chrome webdriver installed
     driver.get(url)  # Replace with your URL
-    time.sleep(5)  # Allow time for JavaScript to execute
+    time.sleep(delay)  # Allow time for JavaScript to execute
     return driver
 
+
+def detectPageElem(driver, selector):
+    try:
+        element = driver.find_element(By.CSS_SELECTOR, selector)
+    except NoSuchElementException:
+        return False
+    
+    return True
+
 # Interact with page through selenium
-def interactWithPageElem(driver, selector):
+def interactWithPageElem(driver, selector, delay = 5):
     print(selector)
+
+    if not detectPageElem(driver, selector):
+        return False
 
     try:
         element = driver.find_element(By.CSS_SELECTOR, selector)
         # Scroll the element into view
         driver.execute_script("arguments[0].scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });", element)
         # Wait for the scrolling animation to complete
-        time.sleep(5)
+        time.sleep(delay)
         # Wait for an element to be clickable before clicking it
         element.click()
     except NoSuchElementException:

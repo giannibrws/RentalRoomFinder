@@ -15,7 +15,7 @@ with open('channels.json', 'r') as f:
 channel = channels[0]
 channel_url = channel['url']
 location = os.getenv("SEARCH_LOCATION")
-csv_file_path = "data.csv" # Define the CSV file path
+csv_file_path = os.getenv("CSV_FILE_PATH")
 
 # Scrape search results
 def scrapeResults(searchResults, scrapeContentKeys): 
@@ -61,13 +61,16 @@ def scrapeResults(searchResults, scrapeContentKeys):
 
         gNextFlag = False
         gFlagKey = "x"
-        flagKeys = ["Aantal huurders", "Leeftijd", "Geslacht", "Doelgroep"]
+        flagKeys = ["Aantal huurders", "Leeftijd", "Geslacht", "Bezigheid"]
+        flagConversionKeys = {'doelgroep': 'bezigheid'}
 
         # Filter all p data
         for p_elem in p_elems:
             if gNextFlag:
+                 # Get the key for the desired value using a dictionary comprehension
+                key = next((key for key, value in flagConversionKeys.items() if value == gFlagKey), gFlagKey)
                 print(p_elem.text)
-                scrapedContent[gFlagKey] = p_elem.text.replace(',', '|') # make sure no commas enter csv
+                scrapedContent[key] = p_elem.text.replace(',', '|') # make sure no commas enter csv
                 gNextFlag = False
                 continue
 
@@ -88,10 +91,19 @@ def scrapeResults(searchResults, scrapeContentKeys):
                     break
 
         h6_elems = soup.select('h6') # get page h6 elems
+        room_tag_keys = ['Gestoffeerd ', 'Kaal ', 'Gemeubileerd ']
+        f1 = f2 = False
 
         for h6_elem in h6_elems:
             if "€" in h6_elem.text:
                 scrapedContent["huurprijs_pm"] = h6_elem.text.replace(u'\xa0', u' ') # remove &nbsp 
+                f1 = True
+            for room_tag_key in room_tag_keys:
+                if room_tag_key in h6_elem.text:
+                    scrapedContent["kamer_type"] = helper.findRoomType(h6_elem.text)
+                    f2 = True
+                    break
+            if f1 and f2:
                 break
         
         helper.writeToCsv(csv_file_path, scrapeContentKeys, list(scrapedContent.values()))

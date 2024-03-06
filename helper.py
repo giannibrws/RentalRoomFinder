@@ -24,6 +24,7 @@ def writeToCsv(csvFilePath: str, rowHeaders: dict, rowValues: list):
         csv_writer = csv.writer(csv_file)
 
         if file_is_empty:
+            print('writing header row')
             csv_writer.writerow(rowHeaders) # Write the header row
 
         # Write data to the CSV file
@@ -56,7 +57,7 @@ def checkCsvValueExists(csvFilePath: str, columnName: str, targetValue: str) -> 
 
     return False  # Return False if the value is not found
 
-
+# Convert csv to excel
 def convertCsvToExcel(csvFilePath: str, excelFilePath: str, columnNames: dict, encoding='latin1'):
     # Read the CSV file into a pandas DataFrame
     df = pd.read_csv(csvFilePath, encoding=encoding, names=columnNames)
@@ -64,9 +65,19 @@ def convertCsvToExcel(csvFilePath: str, excelFilePath: str, columnNames: dict, e
     # Write the DataFrame to an Excel file
     df.to_excel(excelFilePath, index=False)
 
+# Find element in given soup by attr and class
 def findSoup(soup, attr, className):
     e = soup.find(attr, class_=className)
 
     if not e:
         return '-'
     return e.text
+
+
+room_types = ['Kamer', 'Studio', 'Appartement']
+
+# Detect room type of advert
+def findRoomType(search_string):
+    for room_type in room_types:    
+        if  f' {room_type} '  in search_string:
+            return room_type

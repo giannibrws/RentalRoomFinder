@@ -15,32 +15,34 @@ with open('channels.json', 'r') as f:
     channels = json.load(f)
 
 location = os.getenv("SEARCH_LOCATION")
-csv_file_path = "data.csv" # Define the CSV file path
 
 # Define csv headers
-# To-do type kamer vermelden (studio/appartement etc)
-scrapeContentKeys = ['city', 'title', 'url', 'platform', 'post_date', 'aantal_huurders', 'leeftijd', 'geslacht', 'doelgroep', 'huurprijs_pm']
+scrapeContentKeys = ['city', 'title', 'url', 'platform', 'post_date', 'kamer_type', 'aantal_huurders', 'leeftijd', 'geslacht', 'doelgroep', 'huurprijs_pm']
+chromeDriverEnabled = scraper.chromeDriverEnabled()
 
 for channel in channels:
     channel_url = channel['url']
     url_template = channel["scrape_url"]
     max_rent_price = os.getenv("MAX_RENT_PRICE")
 
-    if channel['name'] == 'Kamernet':
-        continue #temp
-
+    if channel['name'] == 'Kamernet' and chromeDriverEnabled:
         max_rent_price = int(max_rent_price) / 100
         # Replace the placeholders with the actual values using string formatting
-        scrape_url = url_template.format(location=location, maxRent=str(max_rent_price), page = 1) # we need to use selenium here
+        scrape_url = url_template.format(location=location, maxRent=str(max_rent_price), page = 1) # We need to use selenium here
         seleniumDriver = scraper.seleniumInit(scrape_url)
 
-        # scrape 10 pages
-        for i in range(1, 10):
+        # Scrape first 10 pages
+        for i in range(1, 2):
             print(scrape_url)
             aria_label = 'pagina'
+            cookie_policy_elem = 'div#onetrust-button-group-parent'
 
             if i > 1:
                 aria_label = 'Ga naar pagina'
+
+            # Skip cookies
+            if (scraper.detectPageElem(seleniumDriver, cookie_policy_elem)):
+                updatedDriver = scraper.interactWithPageElem(seleniumDriver, cookie_policy_elem, 2)
 
             # Find an element by its CSS selector and click it
             paginationSelector =  f'button[aria-label="{aria_label} {i}"]'
@@ -69,4 +71,4 @@ for channel in channels:
         print('unsupported channel')
         sys.exit()
 
-helper.convertCsvToExcel(csv_file_path, 'data.xlsx', scrapeContentKeys)
+helper.convertCsvToExcel(os.getenv("CSV_FILE_PATH"), 'data.xlsx', scrapeContentKeys)

@@ -15,7 +15,6 @@ with open('channels.json', 'r') as f:
 channel = channels[1]
 channel_url = channel['url']
 location = os.getenv("SEARCH_LOCATION")
-csv_file_path = "data.csv" # Define the CSV file path
 
 # Scrape search results
 def scrapeResults(searchResults, scrapeContentKeys): 
@@ -50,11 +49,14 @@ def scrapeResults(searchResults, scrapeContentKeys):
 
         # Get title
         scrapedContent['title'] = soup.find('h1', class_='listing-detail-summary__title').text 
+        print(scrapedContent['title'])
+        
+        scrapedContent['kamer_type'] = helper.findRoomType(scrapedContent['title'])
         scrapedContent['url'] = advert_url
         scrapedContent['platform'] = channel['name']
 
         # Skip scraped searchResults
-        if helper.checkCsvValueExists(csv_file_path, 'url', scrapedContent['url']):
+        if helper.checkCsvValueExists(os.getenv("CSV_FILE_PATH"), 'url', scrapedContent['url']):
             continue
 
         scrapedContent["post_date"] = helper.findSoup(soup, 'dd', 'listing-features__description--offered_since')
@@ -62,7 +64,14 @@ def scrapeResults(searchResults, scrapeContentKeys):
         scrapedContent["leeftijd"] = '-'
         scrapedContent["geslacht"] = '-'
         scrapedContent["doelgroep"] = helper.findSoup(soup,'dd', 'listing-features__description--required_statuses')
-        price = helper.findSoup(soup, 'div', 'listing-detail-summary__price')
-        scrapedContent["huurprijs_pm"] = price.replace(u'\xa0', u' ') # remove &nbsp 
+        price = helper.findSoup(soup, 'div', 'listing-detail-summary__price').strip()
+        price = ' '.join(price.split()) # clear excessive whitespace
+        scrapedContent["huurprijs_pm"] = price.replace(u'\xa0', u' ') # remove &nbsp
+        print(scrapedContent["huurprijs_pm"])
 
-        helper.writeToCsv(csv_file_path, scrapeContentKeys, list(scrapedContent.values()))
+        # Remove all newlines
+        for key in scrapedContent:
+            scrapedContent[key] = scrapedContent[key].replace('\n', '')
+
+        helper.writeToCsv(os.getenv("CSV_FILE_PATH"), scrapeContentKeys, list(scrapedContent.values()))
+        break
