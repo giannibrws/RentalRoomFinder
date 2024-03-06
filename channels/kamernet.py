@@ -33,7 +33,7 @@ def scrapeResults(searchResults, scrapeContentKeys):
             continue
 
         advert_url = channel_url + child_url_sub
-        print(advert_url)
+        print('scraping ' + advert_url)
 
         response = requests.get(advert_url)
 
@@ -69,23 +69,19 @@ def scrapeResults(searchResults, scrapeContentKeys):
             if gNextFlag:
                  # Get the key for the desired value using a dictionary comprehension
                 key = next((key for key, value in flagConversionKeys.items() if value == gFlagKey), gFlagKey)
-                print(p_elem.text)
                 scrapedContent[key] = p_elem.text.replace(',', '|') # make sure no commas enter csv
                 gNextFlag = False
                 continue
 
             if " dagen " in p_elem.text:
                 scrapedContent["post_date"] = p_elem.text
-                print("Found dagen:", p_elem.text)
                 continue
             elif " uur " in p_elem.text:
-                print("Found uur:", p_elem.text)
                 scrapedContent["post_date"] = p_elem.text
                 continue
             
             for key in flagKeys:
                 if key in p_elem.text:
-                    print(f"Found '{key}' in p_elem.text:", p_elem.text)
                     gFlagKey = key.lower().replace(' ', '_') # convert to parsable key
                     gNextFlag = True
                     break
@@ -107,4 +103,3 @@ def scrapeResults(searchResults, scrapeContentKeys):
                 break
         
         helper.writeToCsv(csv_file_path, scrapeContentKeys, list(scrapedContent.values()))
-        print(scrapedContent)

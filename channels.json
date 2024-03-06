@@ -1,16 +1,16 @@
 [
     {
-        "name":  "Kamernet",
-        "url":  "https://kamernet.nl",
+        "name": "Kamernet",
+        "url": "https://kamernet.nl",
         "scrape_url": "https://kamernet.nl/huren/kamers-{location}?radius=7&minSize=2&maxRent={maxRent}&pageNo={page}",
-        "target_class":  "GridGenerator_root__LBMuh",
+        "target_class": "GridGenerator_root__LBMuh",
         "requires_selenium":  true
     },
     {
-        "name":  "Pararius",
-        "url":  "https://www.pararius.nl",
+        "name": "Pararius",
+        "url": "https://www.pararius.nl",
         "scrape_url": "https://www.pararius.nl/huurwoningen/{location}/0-{maxRent}",
-        "target_class":  "search-list",
+        "target_class": "search-list",
         "requires_selenium":  false
     }
 ]

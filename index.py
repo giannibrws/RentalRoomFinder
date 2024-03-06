@@ -29,11 +29,12 @@ for channel in channels:
         max_rent_price = int(max_rent_price) / 100
         # Replace the placeholders with the actual values using string formatting
         scrape_url = url_template.format(location=location, maxRent=str(max_rent_price), page = 1) # We need to use selenium here
+        print(scrape_url)
+
         seleniumDriver = scraper.seleniumInit(scrape_url)
 
         # Scrape first 10 pages
-        for i in range(1, 2):
-            print(scrape_url)
+        for i in range(1, 11):
             aria_label = 'pagina'
             cookie_policy_elem = 'div#onetrust-button-group-parent'
 
@@ -48,7 +49,7 @@ for channel in channels:
             paginationSelector =  f'button[aria-label="{aria_label} {i}"]'
             updatedDriver = scraper.interactWithPageElem(seleniumDriver, paginationSelector)
 
-            # No updates to make so break
+            # No updates to make so break 
             if not updatedDriver:
                 print('break')
                 break
@@ -67,8 +68,5 @@ for channel in channels:
         result_container = scraper.scrapeUrl(scrape_url, channel['target_class'], 'ul')
         searchResults = result_container.findChildren()
         pararius.scrapeResults(searchResults, scrapeContentKeys)
-    else:
-        print('unsupported channel')
-        sys.exit()
 
 helper.convertCsvToExcel(os.getenv("CSV_FILE_PATH"), 'data.xlsx', scrapeContentKeys)

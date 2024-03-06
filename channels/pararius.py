@@ -49,8 +49,6 @@ def scrapeResults(searchResults, scrapeContentKeys):
 
         # Get title
         scrapedContent['title'] = soup.find('h1', class_='listing-detail-summary__title').text 
-        print(scrapedContent['title'])
-        
         scrapedContent['kamer_type'] = helper.findRoomType(scrapedContent['title'])
         scrapedContent['url'] = advert_url
         scrapedContent['platform'] = channel['name']
@@ -67,11 +65,9 @@ def scrapeResults(searchResults, scrapeContentKeys):
         price = helper.findSoup(soup, 'div', 'listing-detail-summary__price').strip()
         price = ' '.join(price.split()) # clear excessive whitespace
         scrapedContent["huurprijs_pm"] = price.replace(u'\xa0', u' ') # remove &nbsp
-        print(scrapedContent["huurprijs_pm"])
 
         # Remove all newlines
         for key in scrapedContent:
             scrapedContent[key] = scrapedContent[key].replace('\n', '')
 
         helper.writeToCsv(os.getenv("CSV_FILE_PATH"), scrapeContentKeys, list(scrapedContent.values()))
-        break

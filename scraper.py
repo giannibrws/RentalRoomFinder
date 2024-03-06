@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -42,7 +41,7 @@ def seleniumInit(url: str , delay = 5):
 
 def detectPageElem(driver, selector):
     try:
-        element = driver.find_element(By.CSS_SELECTOR, selector)
+        driver.find_element(By.CSS_SELECTOR, selector)
     except NoSuchElementException:
         return False
     
